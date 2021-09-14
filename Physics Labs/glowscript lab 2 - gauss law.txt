@@ -1,0 +1,43 @@
+GlowScript 3.0 VPython
+innercharge = float(input('Please enter charge of inner sphere.')) #input sphere charge
+outercharge = float(input('Please enter outer ring charge')) #input ring charge
+sinnerradius = float(input('Please enter inner sphere radius.')) #input radius of sphere
+rinnerradius = float(input('Please enter ring inner radius.')) #input inner radius of ring
+routerradius = float(input('Please enter ring outer radius.'))#input outer radius of ring
+
+Qgraph = gcurve(color=color.red) #declare Qgraph, which represents charge at each radius
+Egraph = gcurve(color=color.cyan) #declare Egraph, which represents the electric field at each radius
+
+k = 9e9 #the value of the constant k
+deltar = .01 #the amount the radius in each graph will change by in the while loop
+theradius = 0 #the radius value used for the x axis of each graph
+scalefactor = 1e10 #scale factor used to size Qgraph so it can be seen in relation to Egraph
+
+thering = ring(pos=vector(0, 0, 0), axis=vector(0, 0, 1), radius=rinnerradius, thickness=(routerradius-rinnerradius)) #3D representation of the ring surrrounding the sphere
+particle = sphere(pos=vector(0, 0, 0), radius=sinnerradius, color=color.red) #3D representation of the sphere inside the ring
+
+arrow1 = arrow(pos = vector(0, 0, 0), axis = vector(0, rinnerradius, 0)) #upward arrow going outward to represent the direction of the electric field
+arrow2 = arrow(pos = vector(0, 0, 0), axis = vector(0, -rinnerradius, 0)) #downward arrow going outward to represent direction of efield
+arrow3 = arrow(pos = vector(0, 0, 0), axis = vector(rinnerradius, 0, 0)) #rightward arrow going outward to represent direction of efield
+arrow4 = arrow(pos = vector(0, 0, 0), axis = vector(-rinnerradius, 0, 0)) #leftward arrow going outward to represent direction of efield
+
+arrow5 = arrow(pos = vector(0, 1.6, 0), axis = vector(0, routerradius, 0)) #upward arrow going outward to represent the direction of the electric field outside the ring
+arrow6 = arrow(pos = vector(0, -1.6, 0), axis = vector(0, -routerradius, 0)) #downward arrow going outward to represent direction of efield outside the ring
+arrow7 = arrow(pos = vector(1.6, 0, 0), axis = vector(routerradius, 0, 0)) #rightward arrow going outward to represent direction of efield outside the ring
+arrow8 = arrow(pos = vector(-1.6, 0, 0), axis = vector(-routerradius, 0, 0)) #leftward arrow going outward to represent direction of efield outside the ring
+
+while(theradius < routerradius*5): #running the loop until the value of "theradius" becomes greater than routerradius*5
+    if(theradius < sinnerradius): #if current radius value is less than the inner radius of the sphere then use the following code to find charge and electric field (r<a)
+        Egraph.plot(pos = (theradius, (k*((innercharge*theradius)/(sinnerradius*sinnerradius*sinnerradius))))) #calculating and plotting value of efield in this region 
+        charge = innercharge*((theradius*theradius*theradius)/(sinnerradius*sinnerradius*sinnerradius)) #calculating the charge in this region using charge density
+        Qgraph.plot(pos = (theradius, scalefactor*charge)) #plotting the charge in this region
+    if((theradius > sinnerradius) and (theradius < rinnerradius)): #if current radius value is greater than inner radius of sphere but less than inner radius of ring then use the following code (a<r<b)
+        Egraph.plot(pos=(theradius, ((k*innercharge)/(theradius*theradius)))) #calculating and plotting value of efield in this region 
+        Qgraph.plot(pos = (theradius, scalefactor*innercharge)) #calculating and plotting value of the charge in this region
+    if((theradius > rinnerradius) and (theradius < routerradius)): #if current radius value is greater than the ring inner radius but less than the ring outer radius then use the following code (b<r<c)
+        Egraph.plot(pos = (theradius, 0)) #plotting the efield in this region as 0 because the sphere is insulating and the ring is conducting
+        Qgraph.plot(pos = (theradius, 0)) #plotting the charge in this region as 0 because the sphere is insulating and the ring is conducting
+    if(theradius > routerradius):#if the current radius value is greater than the outer radius of the ring then use the following code (r>c)
+        Egraph.plot(pos = (theradius, ((k*(outercharge+innercharge))/(theradius*theradius)))) #calculating and plotting the value of the efield in this region, which encapsulates both the sphere and the ring (so it is outer+inner charge)
+        Qgraph.plot(pos = (theradius, scalefactor*(outercharge+innercharge))) #calculating and plotting the value of the charge in this region (outer+inner charge for same reason as efield)
+    theradius = theradius+deltar #changing the value of the radius by deltar so the while loop stops once theradius becomes routerradius*5

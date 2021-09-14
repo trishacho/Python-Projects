@@ -1,0 +1,34 @@
+GlowScript 3.0 VPython
+pcharge = 1.6e-19 #charge of the proton
+pmass = 1.67e-27 #mass of the proton
+efield = vector(0, 100000, 0) #vector representing the electric field
+
+particle = sphere(pos = vector(1, 0.15, -0.3), radius = 2e-2, color = color.red) #creating the 3D representation of the particle
+trail = curve(color = particle.color) #creating the 3D representation of the trail "left behind" by the particle
+
+#3D representation of electric field
+arrow1 = arrow(pos = vector(-0.15, 0, 0), axis = vector(0, 0.1, 0), color = color.cyan) #creates the first arrow of the efield
+i = 0 #setting i=0 so it can be used as a "counter"/"maximum" in the while loop
+while i < .5: #running loop until i becomes 0.5 so it creates 4 more arrows
+    newArrow = arrow(pos=vector(-0.15 + i, 0, 0), axis = vector(0, 0.1, 0), color=color.cyan) #creating the 3D representation of the other four arrows of the efield
+    i = i + 0.1 #adding 0.1 to the exisiting value of i so once it reaches 0.5, the loop ends
+
+velocity = vector(-4e6, 0, 0) #the velocity vector
+momentum = velocity*pmass #the initial value of the momentum
+
+deltat = .000000005 #the value the time is changed by
+t = 0 #setting time to 0 at first in order to use it in the loop (just like i=0 for the previous while loop)
+
+force = pcharge*efield #finding the value of the electrostatic force
+
+while t <= .0001: #running the loop until the time becomes greater than .0001
+    if(t<1.3e-7): #until t=1.3e-7, aka when the particle hits the efield, it moves in a straight line
+        particle.pos = particle.pos + velocity*deltat #updating the particle's position using the equation final pos = initial pos + velocity*deltat (vector equation)
+    else: #else statement so once time becomes greater than 1.3e-7, it hits the efield and moves upward
+        impulse = force*deltat #calculating the value of impulse in order to add it to momentum
+        momentum = momentum + impulse #updating momentum 
+        velocity = momentum/pmass #finding the new velocity of the particle using momentum and the mass of the proton
+        particle.pos = particle.pos + velocity*deltat #updating the position of the particle 
+    trail.append(pos = particle.pos) #making the trail move along with the particle
+    rate(50) #setting the rate to 50 so we can see the particle move!
+    t = t+deltat #adding deltat to the current value of time so the while loop ends once t is greater than .0001

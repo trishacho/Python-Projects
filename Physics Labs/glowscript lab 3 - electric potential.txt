@@ -1,0 +1,31 @@
+GlowScript 3.0 VPython
+innercharge = float(input('Please enter charge of inner sphere.')) #input sphere charge
+sinnerradius = float(input('Please enter inner sphere radius.'))  #input radius of sphere
+
+Qgraph = gcurve(color=color.red) #declare Qgraph, which represents charge at each radius
+Egraph = gcurve(color=color.cyan) #declare Egraph, which represents the electric field at each radius
+Pgraph = gcurve(color=color.green) #declare Pgraph, which represents the electric potential at each radius
+
+k = 9e9 #the value of the constant k
+deltar = .01 #the amount the radius in each graph will change by in the while loop
+theradius = 0 #the radius value used for the x axis of each graph
+potential = 0 #the electric potential 
+scalefactor = 1e10 #scale factor used to size Qgraph so it can be seen in relation to Egraph and Pgraph
+particle = sphere(pos=vector(0, 0, 0), radius=sinnerradius, color=color.red) #3D representation of the sphere
+
+while(theradius < 5*sinnerradius): #running the loop until the value of "theradius" becomes greater than routerradius*5 
+    if(theradius <= sinnerradius): #if current radius value is less than or equal to the inner radius of the sphere then use the following code to find charge, electric field, and electric potential (r<=a)
+        Egraph.plot(pos = (theradius, (k*((innercharge*theradius)/(sinnerradius*sinnerradius*sinnerradius))))) #calculating and plotting value of efield in this region 
+        charge = innercharge*((theradius*theradius*theradius)/(sinnerradius*sinnerradius*sinnerradius)) #calculating the charge in this region using charge density
+        Qgraph.plot(pos = (theradius, scalefactor*charge)) #plotting the charge in this region
+        potential = (k*innercharge/2*sinnerradius)*(3 - (theradius*theradius)/(sinnerradius*sinnerradius)) #calculating the electric potential in this region using the efield
+        Pgraph.plot(pos = (theradius, potential)) #plotting the electric potential in this region
+    if(theradius > sinnerradius): #if current radius value is greater than the inner radius of the sphere then use the following code to find charge, efield, and electric potential (r>a)
+        Egraph.plot(pos = (theradius, ((k*innercharge)/(theradius*theradius)))) #calculating and plotting the value of the efield in this region
+        Qgraph.plot(pos = (theradius, scalefactor*(innercharge))) #calculating and plotting the value of the charge in this region
+        potential = ((k*charge)/theradius) #calculating the electric potential in this region using potential = 0 at radius = infinity
+        Pgraph.plot(pos = (theradius, potential)) #plotting the value of the electric potential in this region
+    theradius = theradius + deltar #changing the value of the radius by deltar so the while loop stops once theradius becomes routerradius*5
+
+
+   
